@@ -22,11 +22,11 @@ from botocore.exceptions import ClientError
 from datetime import datetime, timedelta
 import math
 
-aws_region = 'ca-central-1'
-s3_bucket = 'bucket-name-lambda-s3'
-s3_prefix = 'exported-logs'
-num_days = 1
-log_group_name = ['/aws/lambda/lambda-function-watcher-prod-lambdaWatcher']
+AWS_REGION = 'ca-central-1'
+S3_BUCKET = 'bucket-name-lambda-s3'
+S3_PREFIX = 'exported-logs'
+NUM_DAYS = 1
+LOG_GROUP_NAME = ['/aws/lambda/lambda-function-watcher-prod-lambdaWatcher']
 
 
 ######################################
@@ -36,21 +36,21 @@ def publish_logs_s3(log_client):
 
     try:
 
-        logDate = datetime.now() - timedelta(days=num_days)
+        logDate = datetime.now() - timedelta(days=NUM_DAYS)
         print (logDate)
         startOfDay = logDate.replace(hour=0, minute=0, second=0, microsecond=0)
         print(startOfDay)
         endOfDay = logDate.replace(hour=23, minute=59, second=59, microsecond=999999)
         print(endOfDay)
 
-        for log in log_group_name:
+        for log in LOG_GROUP_NAME:
             response = log_client.create_export_task(
              taskName='export_task',
              logGroupName=log,
              fromTime=math.floor(startOfDay.timestamp() * 1000),
              to=math.floor(endOfDay.timestamp() * 1000),
-             destination=s3_bucket,
-             destinationPrefix=s3_prefix
+             destination=S3_BUCKET,
+             destinationPrefix=S3_PREFIX
             )
 
     except ClientError as err:
@@ -74,7 +74,7 @@ def main():
     )
     print(session)
     # Initializing Client
-    log_client = boto3.client('logs', region_name=aws_region)
+    log_client = boto3.client('logs', region_name=AWS_REGION)
     """ :type: pyboto3.iam """
 
     # Calling the function to delete all cloudwatch logs & alarms
